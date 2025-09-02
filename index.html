@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.A. App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #1a202c;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 48rem;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .tab-button {
+            background-color: transparent;
+            color: #4a5568;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #3182ce;
+            border-bottom-color: #3182ce;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .btn-primary {
+            background-color: #3182ce;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+        }
+
+        .btn-secondary {
+            background-color: #cbd5e0;
+            color: #2d3748;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #a0aec0;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c5282;
+            margin-bottom: 1rem;
+        }
+
+        .contact-card {
+            background-color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+
+        .contact-card i {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #2c5282;
+        }
+
+        .mood-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .mood-button {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .mood-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 24rem;
+            text-align: center;
+        }
+
+        .game-canvas-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        canvas {
+            background-color: transparent;
+        }
+
+        .leaderboard-container {
+            margin-top: 2rem;
+            background-color: #f7fafc;
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            color: #d1d5db;
+        }
+
+        .star-rating .fas {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star-rating .fas.active {
+            color: #facc15;
+        }
+
+        .diary-entry {
+            background-color: #f7fafc;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: left;
+            margin-top: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .diary-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .delete-btn {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-controls {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .main-game-button-container {
+            position: relative;
+            width: 15rem;
+            height: 15rem;
+            margin-top: 1.5rem;
+            border-radius: 50%;
+        }
+
+        .main-game-button {
+            padding: 2.5rem;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            font-size: 2.25rem;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3), 0 0 20px rgba(76, 175, 80, 0.5);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .main-game-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4), 0 0 30px rgba(76, 175, 80, 0.7);
+        }
+
+        .main-game-button:active {
+            transform: scale(0.98);
+        }
+        
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .upgrade-card {
+            background-color: #f7fafc;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: left;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .buy-upgrade-btn {
+            background-color: #4a5568;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .buy-upgrade-btn:hover {
+            background-color: #2d3748;
+        }
+
+        .clinic-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+
+        .clinic-list-item {
+            background-color: #f7fafc;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <!-- Welcome Modal -->
+    <div id="splash-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-2">Bem-vindo(a) ao S.A.</h3>
+            <p class="text-gray-700 mb-4">Este é um espaço seguro e de apoio. Lembre-se, você não está sozinho(a). Vamos começar?</p>
+            <button id="splash-close" class="btn-primary">Entrar</button>
+        </div>
+    </div>
+
+    <div class="card hidden">
+        <div class="logo">S.A.</div>
+        <div class="flex justify-center border-b border-gray-200 mb-6">
+            <button class="tab-button active" data-tab="tab1">Ajuda Imediata</button>
+            <button class="tab-button" data-tab="tab2">Diário</button>
+            <button class="tab-button" data-tab="tab3">Jogo de Relaxamento</button>
+        </div>
+
+        <div id="tab1" class="tab-content active">
+            <h2 class="text-2xl font-bold mb-4">Ajuda Imediata</h2>
+            <p class="mb-4">Se você ou alguém que você conhece está em crise, por favor, procure ajuda imediatamente.</p>
+            
+            <div class="mb-4">
+                <label for="city-select" class="block text-sm font-medium text-gray-700 mb-2">Selecione sua cidade para encontrar clínicas de psicólogos:</label>
+                <select id="city-select" class="w-full p-2 border border-gray-300 rounded-lg">
+                    <option value="">-- Selecione uma cidade --</option>
+                    <option value="Aracaju">Aracaju</option>
+                    <option value="Nossa Senhora do Socorro">Nossa Senhora do Socorro</option>
+                    <option value="Barra dos Coqueiros">Barra dos Coqueiros</option>
+                    <option value="São Cristóvão">São Cristóvão</option>
+                </select>
+            </div>
+
+            <button id="show-clinics-btn" class="btn-primary w-full mt-2">
+                <i class="fas fa-search mr-2"></i> Buscar Clínicas
+            </button>
+
+            <ul id="clinic-list" class="clinic-list hidden"></ul>
+
+            <div class="contact-card">
+                <i class="fas fa-phone"></i>
+                <div>
+                    <h3 class="font-semibold text-lg">Centro de Valorização da Vida (CVV)</h3>
+                    <p class="text-sm">Telefone: 188</p>
+                    <p class="text-sm">Oferece apoio emocional e prevenção do suicídio. Atendimento 24 horas e gratuito.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab2" class="tab-content">
+            <h2 class="text-2xl font-bold mb-4">Diário</h2>
+            <p class="mb-4">Escreva sobre como você se sente hoje e avalie seu dia com estrelas.</p>
+            
+            <!-- Journaling Section -->
+            <div class="mt-8 text-left">
+                <h3 class="text-xl font-bold mb-2">Escreva Sobre o Seu Dia</h3>
+                <textarea id="journal-entry" class="w-full h-32 p-3 border rounded-lg resize-none"
+                    placeholder="O que aconteceu hoje?"></textarea>
+                <div class="star-rating mt-2">
+                    <i class="fas fa-star" data-rating="1"></i>
+                    <i class="fas fa-star" data-rating="2"></i>
+                    <i class="fas fa-star" data-rating="3"></i>
+                    <i class="fas fa-star" data-rating="4"></i>
+                    <i class="fas fa-star" data-rating="5"></i>
+                </div>
+                <p id="rating-text" class="text-center text-sm text-gray-500 mt-2">Toque nas estrelas para avaliar</p>
+                <button id="save-journal" class="btn-primary w-full mt-4">Salvar Entrada</button>
+
+                <div id="diary-entries-container" class="mt-6">
+                    <h3 class="text-xl font-bold mb-2">Suas Anotações</h3>
+                    <!-- Diary entries will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <div id="tab3" class="tab-content">
+            <h2 class="text-2xl font-bold mb-4">Jogo de Relaxamento</h2>
+            <p class="mb-4">Clique no botão para ganhar pontos e comprar melhorias!</p>
+            
+            <!-- Panic Button for Gambling Addiction -->
+            <button id="panic-gambling" class="btn-primary w-full mb-4">
+                <i class="fas fa-dice mr-2"></i> Preciso de Ajuda Agora!
+            </button>
+
+            <!-- Game Area -->
+            <div class="game-area mt-4">
+                <div class="text-4xl font-extrabold text-green-700">
+                    <span id="points">0</span>
+                </div>
+                <div class="text-md font-medium text-gray-500">
+                    Pontos por Segundo: <span id="pps">0</span>
+                </div>
+                <div class="main-game-button-container">
+                    <button id="main-click-btn" class="main-game-button animate-pulse">
+                        <i class="fas fa-hand-point-up"></i>
+                    </button>
+                    <canvas id="particle-canvas"></canvas>
+                </div>
+            </div>
+            
+            <!-- Upgrades Section -->
+            <div class="mt-8 text-left">
+                <h3 class="text-xl font-bold mb-2">Melhorias</h3>
+                <div id="upgrades-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Upgrades will be populated by JS -->
+                </div>
+            </div>
+
+            <p id="game-message" class="mt-4 text-sm text-gray-600"></p>
+            
+            <!-- Fake Online Leaderboard -->
+            <div class="leaderboard-container">
+                <h3 class="font-bold text-lg mb-2">Placar Online</h3>
+                <div id="leaderboard" class="text-sm">
+                    <!-- Leaderboard will be populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Message Box -->
+    <div id="modal-message" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+            <p id="modal-text" class="text-gray-700 mb-4"></p>
+            <div id="modal-fields" class="flex flex-col gap-4 mb-4 hidden">
+                <input type="text" id="location-input" class="p-2 border rounded-md" placeholder="Sua localização (ex: cidade)">
+                <textarea id="symptoms-input" class="p-2 border rounded-md" placeholder="Descreva seus sintomas (opcional)"></textarea>
+                <button id="modal-submit" class="btn-primary">Enviar</button>
+            </div>
+            <button id="modal-close" class="btn-primary">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainCard = document.querySelector('.card');
+            const splashModal = document.getElementById('splash-modal');
+            const splashCloseBtn = document.getElementById('splash-close');
+            const tabs = document.querySelectorAll('.tab-button');
+            const contents = document.querySelectorAll('.tab-content');
+            const modal = document.getElementById('modal-message');
+            const modalTitle = document.getElementById('modal-title');
+            const modalText = document.getElementById('modal-text');
+            const modalFields = document.getElementById('modal-fields');
+            const modalSubmitBtn = document.getElementById('modal-submit');
+            const modalCloseBtn = document.getElementById('modal-close');
+            const panicGamblingBtn = document.getElementById('panic-gambling');
+            
+            const gameMessage = document.getElementById('game-message');
+            const leaderboardEl = document.getElementById('leaderboard');
+            
+            // --- Game Variables ---
+            const pointsEl = document.getElementById('points');
+            const ppsEl = document.getElementById('pps');
+            const mainClickBtn = document.getElementById('main-click-btn');
+            const upgradesContainer = document.getElementById('upgrades-container');
+
+            let userPoints = parseInt(localStorage.getItem('userPoints')) || 0;
+            let pointsPerClick = 1;
+            let pointsPerSecond = 0;
+            
+            const upgrades = [{
+                id: 'cursor',
+                name: 'Clique Automatizado',
+                cost: 10,
+                basePps: 1,
+                owned: 0,
+                icon: '<i class="fas fa-mouse-pointer"></i>'
+            }, {
+                id: 'robot',
+                name: 'Robô Minerador',
+                cost: 100,
+                basePps: 10,
+                owned: 0,
+                icon: '<i class="fas fa-robot"></i>'
+            }, {
+                id: 'factory',
+                name: 'Fábrica de Pontos',
+                cost: 1000,
+                basePps: 100,
+                owned: 0,
+                icon: '<i class="fas fa-industry"></i>'
+            }];
+
+            // --- Game State & Leaderboard ---
+            let lastResetTime = parseInt(localStorage.getItem('lastResetTime')) || Date.now();
+            const TEN_MINUTES_MS = 10 * 60 * 1000;
+            
+            // Show splash modal on page load
+            splashCloseBtn.addEventListener('click', () => {
+                splashModal.classList.add('hidden');
+                mainCard.classList.remove('hidden');
+            });
+
+            // --- Modal Logic ---
+            function showModal(title, text, showFields = false) {
+                modalTitle.textContent = title;
+                modalText.textContent = text;
+                if (showFields) {
+                    modalFields.classList.remove('hidden');
+                    modalCloseBtn.classList.add('hidden');
+                    modalSubmitBtn.classList.remove('hidden');
+                } else {
+                    modalFields.classList.add('hidden');
+                    modalCloseBtn.classList.remove('hidden');
+                    modalSubmitBtn.classList.add('hidden');
+                }
+                modal.classList.remove('hidden');
+            }
+
+            modalCloseBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+            // --- Tab Functionality ---
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+
+            // --- Suicide Prevention - Clinic List
+            const clinicsByCity = {
+                "Aracaju": [
+                    { name: "Psicóloga Lorena Amorim", url: "https://business.google.com/v/_/013004917969973329704/bfc1/_?caid=16780813820&agid=133861489103&gclid=CjwKCAjwq9rFBhAIEiwAGVAZP10VHfDMG2xud7jlR1arqb4yGeixxKFkbHwyqNKO-zIcf9cl4BmoPxoCqE0QAvD_BwE&gad_source=6&gad_campaignid=16780813820&gbraid=0AAAAAohpt9InUVCb3X9dKGyM2b6IEGkGC" },
+                    { name: "Equilibrius Psicologia", url: "https://equilibriuspsicologia.com.br/" },
+                    { name: "Isaque Santana Psicólogo", url: "https://www.isaquesantana.com.br/" },
+                    { name: "Bianca Galindo Psicóloga", url: "https://www.biancagalindo.com.br/" },
+                    { name: "Portal Humana", url: "https://portalhumana.com.br/" },
+                    { name: "Denisson Santana Psicólogo", url: "https://psidenissonsantana.wixsite.com/website" }
+                ]
+            }; // <-- closing bracket and semicolon added here for clinicsByCity object
+
+            const citySelect = document.getElementById('city-select');
+            const showClinicsBtn = document.getElementById('show-clinics-btn');
+            const clinicListEl = document.getElementById('clinic-list');
+
+            showClinicsBtn.addEventListener('click', () => {
+                const selectedCity = citySelect.value;
+                if (!selectedCity) {
+                    showModal("Erro", "Por favor, selecione uma cidade.");
+                    return;
+                }
+
+                const clinics = clinicsByCity[selectedCity];
+                clinicListEl.innerHTML = '';
+                if (clinics && clinics.length > 0) {
+                    clinics.forEach(clinic => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'clinic-list-item';
+                        const link = document.createElement('a');
+                        link.href = clinic.url;
+                        link.textContent = clinic.name;
+                        link.target = "_blank"; // Open in new tab
+                        listItem.appendChild(link);
+                        clinicListEl.appendChild(listItem);
+                    });
+                    clinicListEl.classList.remove('hidden');
+                } else {
+                    clinicListEl.classList.add('hidden');
+                    showModal("Aviso", `Não há clínicas cadastradas para ${selectedCity}.`);
+                }
+            });
+
+            // --- Diary Functionality ---
+            const stars = document.querySelectorAll('.star-rating .fa-star');
+            const ratingText = document.getElementById('rating-text');
+            const saveJournalBtn = document.getElementById('save-journal');
+            const journalEntryTextarea = document.getElementById('journal-entry');
+            const diaryEntriesContainer = document.getElementById('diary-entries-container');
+            let currentRating = 0;
+
+            // Star rating interaction
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    currentRating = parseInt(star.dataset.rating);
+                    stars.forEach(s => s.classList.remove('active'));
+                    for (let i = 0; i < currentRating; i++) {
+                        stars[i].classList.add('active');
+                    }
+                    ratingText.textContent = `Você deu ${currentRating} estrelas`;
+                });
+            });
+
+            // Load saved entries
+            function loadEntries() {
+                const entries = JSON.parse(localStorage.getItem('diaryEntries')) || [];
+                diaryEntriesContainer.innerHTML = '';
+                entries.forEach((entry, index) => {
+                    const entryEl = document.createElement('div');
+                    entryEl.className = 'diary-entry';
+                    let starIcons = '';
+                    for (let i = 0; i < entry.rating; i++) {
+                        starIcons += '<i class="fas fa-star text-yellow-400"></i>';
+                    }
+                    entryEl.innerHTML = `
+                        <div class="diary-entry-header">
+                            <div class="text-gray-500 text-sm">${entry.date}</div>
+                            <button class="delete-btn" data-index="${index}">Excluir</button>
+                        </div>
+                        <p class="mt-2">${entry.text}</p>
+                        <div class="mt-2 star-rating justify-start">${starIcons}</div>
+                    `;
+                    diaryEntriesContainer.prepend(entryEl);
+                });
+            }
+            
+            // Delete entry functionality
+            diaryEntriesContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-btn')) {
+                    const index = e.target.dataset.index;
+                    const entries = JSON.parse(localStorage.getItem('diaryEntries')) || [];
+                    entries.splice(index, 1);
+                    localStorage.setItem('diaryEntries', JSON.stringify(entries));
+                    loadEntries();
+                }
+            });
+
+            // Save new entry
+            saveJournalBtn.addEventListener('click', () => {
+                const entryText = journalEntryTextarea.value.trim();
+                if (!entryText) {
+                    showModal("Erro", "Por favor, escreva algo antes de salvar.");
+                    return;
+                }
+
+                if (currentRating === 0) {
+                    showModal("Erro", "Por favor, avalie seu dia com estrelas.");
+                    return;
+                }
+
+                const newEntry = {
+                    text: entryText,
+                    rating: currentRating,
+                    date: new Date().toLocaleDateString('pt-BR')
+                };
+
+                const entries = JSON.parse(localStorage.getItem('diaryEntries')) || [];
+                entries.push(newEntry);
+                localStorage.setItem('diaryEntries', JSON.stringify(entries));
+
+                journalEntryTextarea.value = '';
+                stars.forEach(s => s.classList.remove('active'));
+                ratingText.textContent = "Toque nas estrelas para avaliar";
+                currentRating = 0;
+                
+                showModal("Anotação Salva", "Sua anotação foi salva com sucesso.");
+
+                // Motivational pop-up for 1 star
+                if (newEntry.rating === 1) {
+                    showModal("Não Desista!", "Dias difíceis também passam. Lembre-se de que sua força interior é maior do que qualquer desafio. Você é capaz e merece ser feliz.");
+                }
+
+                loadEntries();
+            });
+
+            // --- Idle Game Logic ---
+            const particleCanvas = document.getElementById('particle-canvas');
+            const particleCtx = particleCanvas.getContext('2d');
+            let particles = [];
+            
+            particleCanvas.width = 240;
+            particleCanvas.height = 240;
+
+            function Particle(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.color = color;
+                this.alpha = 1;
+            }
+
+            Particle.prototype.update = function() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= 0.02;
+            }
+
+            Particle.prototype.draw = function() {
+                particleCtx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+                particleCtx.beginPath();
+                particleCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                particleCtx.fill();
+            }
+
+            function handleParticles() {
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                for (let i = 0; i < particles.length; i++) {
+                    if (particles[i].alpha <= 0) {
+                        particles.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+
+            function createParticles() {
+                const colors = ["59, 130, 246", "239, 68, 68", "251, 191, 36"];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                for (let i = 0; i < 10; i++) {
+                    particles.push(new Particle(120, 120, color));
+                }
+            }
+            
+            function animateParticles() {
+                particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+                handleParticles();
+                requestAnimationFrame(animateParticles);
+            }
+
+            // Start particle animation loop
+            animateParticles();
+
+            function updateDisplay() {
+                pointsEl.textContent = Math.floor(userPoints).toLocaleString('pt-BR');
+                ppsEl.textContent = pointsPerSecond.toLocaleString('pt-BR');
+                renderUpgrades();
+            }
+
+            function renderUpgrades() {
+                upgradesContainer.innerHTML = '';
+                upgrades.forEach(upgrade => {
+                    const upgradeEl = document.createElement('div');
+                    upgradeEl.className = 'upgrade-card flex justify-between items-center';
+                    upgradeEl.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="text-2xl text-gray-700">${upgrade.icon}</div>
+                            <div>
+                                <div class="font-bold">${upgrade.name}</div>
+                                <div class="text-sm text-gray-600">
+                                    Possuído: ${upgrade.owned}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <div class="text-sm font-semibold text-gray-800">Custo: ${upgrade.cost.toLocaleString('pt-BR')}</div>
+                            <button class="buy-upgrade-btn mt-2" data-id="${upgrade.id}">Comprar</button>
+                        </div>
+                    `;
+                    upgradesContainer.appendChild(upgradeEl);
+                });
+            }
+
+            upgradesContainer.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const upgradeId = e.target.dataset.id;
+                    const upgrade = upgrades.find(u => u.id === upgradeId);
+                    if (userPoints >= upgrade.cost) {
+                        userPoints -= upgrade.cost;
+                        upgrade.owned++;
+                        pointsPerSecond += upgrade.basePps;
+                        upgrade.cost = Math.floor(upgrade.cost * 1.5); // Increase cost for next purchase
+                        localStorage.setItem('userPoints', userPoints);
+                        updateDisplay();
+                    } else {
+                        showModal("Pontos Insuficientes", "Você precisa de mais pontos para comprar esta melhoria.");
+                    }
+                }
+            });
+
+            mainClickBtn.addEventListener('click', () => {
+                userPoints += pointsPerClick;
+                localStorage.setItem('userPoints', userPoints);
+                updateDisplay();
+                createParticles();
+            });
+
+            // Game loop for idle points
+            setInterval(() => {
+                userPoints += pointsPerSecond;
+                localStorage.setItem('userPoints', userPoints);
+                updateDisplay();
+            }, 1000);
+
+            // --- Leaderboard functionality ---
+            function updateLeaderboard() {
+                let scores = [
+                    { name: 'OPró_1', score: 1000 },
+                    { name: 'NoobMaster_2', score: 950 },
+                    { name: 'SemNick_3', score: 900 }
+                ];
+                
+                const now = Date.now();
+                const TEN_MINUTES_MS = 10 * 60 * 1000;
+                if (now - lastResetTime > TEN_MINUTES_MS) { // Reset every 10 minutes
+                    lastResetTime = now;
+                    localStorage.setItem('lastResetTime', lastResetTime);
+                    scores = [
+                        { name: 'Jogador_1', score: Math.floor(Math.random() * 500) + 1200 },
+                        { name: 'Jogador_2', score: Math.floor(Math.random() * 500) + 1100 },
+                        { name: 'Jogador_3', score: Math.floor(Math.random() * 500) + 1000 }
+                    ];
+                }
+                
+                const combinedScores = [...scores, { name: 'Você', score: userPoints }];
+                combinedScores.sort((a, b) => b.score - a.score);
+
+                leaderboardEl.innerHTML = '';
+                combinedScores.forEach((player, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item';
+                    item.innerHTML = `<span>#${index + 1} ${player.name}</span><span>${player.score.toLocaleString('pt-BR')} pontos</span>`;
+                    leaderboardEl.appendChild(item);
+                });
+            }
+
+            setInterval(updateLeaderboard, 60000); // Update every minute to show some dynamism
+
+            panicGamblingBtn.addEventListener('click', () => {
+                showModal("Desafio do Jogo", "Este jogo é uma distração segura para você. Concentre-se em vencer o placar. O jogo real é a sua vida.");
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                const gameTabButton = document.querySelector('[data-tab="tab3"]');
+                gameTabButton.classList.add('active');
+                document.getElementById('tab3').classList.add('active');
+            });
+            
+            // Initial load
+            updateDisplay();
+            updateLeaderboard();
+            loadEntries();
+        });
+    </script>
+</body>
+
+</html>
