@@ -28,7 +28,7 @@ Um espaço privado para autoconhecimento e expressão:
 
 ---
 
-### 🎮 Jogo de Relaxamento
+###  Jogo de Relaxamento
 Uma alternativa saudável para quem enfrenta vício em jogos de azar:
 - **Mecânica Idle Game:**  
   Clique para acumular pontos e adquira melhorias automáticas.
@@ -39,7 +39,7 @@ Uma alternativa saudável para quem enfrenta vício em jogos de azar:
 
 ---
 
-## 🛠 Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 - **HTML5** → Estrutura do aplicativo  
 - **CSS (Tailwind CSS)** → Estilização responsiva e moderna  
 - **JavaScript** → Lógica do jogo, interações e armazenamento local  
